@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="preload" as="script" href="https://static.web-repository.com/scripts/platform.client.min.js?v=1010" />
     <link rel="icon" href="dist/images/4.png" />
-   
+
     <meta name="robots" content="noindex">
 
     <link rel="preload stylesheet" as="style" media="all"
@@ -817,7 +817,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 8px;
-            max-width: 85%;
+            max-width: 50%;
             max-height: 90%;
             overflow-y: auto;
         }
@@ -826,10 +826,20 @@
             max-width: 10%;
             margin: 10px 0;
         }
+
         @media (max-width: 768px) {
             .popup-images img {
                 max-width: 30%;
                 height: auto
+            }
+
+            .popup-content {
+                background: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                max-width: 85%;
+                max-height: 90%;
+                overflow-y: auto;
             }
         }
 
@@ -978,7 +988,7 @@
                                                 }
                                             </style>
                                             <div style="text-align: center;">
-                                                <a href="#comprar" target="_self"
+                                                <a href="#comprar-contraentrega" target="_self"
                                                     class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 15px 30px;
@@ -1205,7 +1215,7 @@
                                                 }
                                             </style>
                                             <div style="text-align: center;">
-                                                <a href="#comprar" target="_self"
+                                                <a href="#comprar-contraentrega2" target="_self"
                                                     class="theme-button hvr-rectangle-out   " style="font-size: 22px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;border-color: rgba(137, 35, 255, 1);letter-spacing:0px;border-width: 3px;
              padding: 12px 24px;
@@ -1267,7 +1277,7 @@
                  top: 0px;
                  
                  ">
-                            
+
                                 <div class="widget-row ">
                                     <div class="widget 
           widgetResponsive textWidget headingWidget col20" id="heading-widget-1695571747448" data-type="HeadingWidget"
@@ -1275,7 +1285,7 @@
                                         data-animation="lazyAnimation-" style="margin-top: 0%; margin-left: 0%;">
                                         <div class="text-widget-content">
                                             <h4 style="text-align: left;">
-                                                <div style="text-align: center;"><span
+                                                <div style="text-align: center;" id="comprar-contraentrega"><span
                                                         style="font-size: 24px; background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); font-family: Cottorway;"><span
                                                             style="font-size: 28px;">Su diseño compacto y ligero, junto
                                                             con su sonido estéreo de alta calidad</span><br><span
@@ -1287,18 +1297,19 @@
                                         </div>
                                     </div>
                                 </div>
-                            <div class="widget-row with-centered-content">
-                                <div class="widget 
-                                      widgetResponsive textWidget headingWidget col13" id="heading-widget-1695571747449" data-type="HeadingWidget"
-                                    data-delay data-animation-duration data-animation-delay data-animation="lazyAnimation-"
-                                    style="margin-top: 0px; margin-left: 0px;">
-                                    <div class="text-widget-content">
-                                        <h2 style="text-align: center; margin-top: 1rem;"><span class
-                                                style="color: rgb(255, 255, 255); font-size: 48px; font-family: &quot;Cottorway Xtra Bold&quot;;">
-                                                Selecciona tus colores favoritos</span></h2>
+                                <div class="widget-row with-centered-content">
+                                    <div class="widget 
+                                      widgetResponsive textWidget headingWidget col13"
+                                        id="heading-widget-1695571747449" data-type="HeadingWidget" data-delay
+                                        data-animation-duration data-animation-delay data-animation="lazyAnimation-"
+                                        style="margin-top: 0px; margin-left: 0px;">
+                                        <div class="text-widget-content">
+                                            <h2 style="text-align: center; margin-top: 1rem;"><span class
+                                                    style="color: rgb(255, 255, 255); font-size: 48px; font-family: &quot;Cottorway Xtra Bold&quot;;">
+                                                    Selecciona tus colores favoritos</span></h2>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                                 <div class="widget-row ">
                                     <div class="widget 
           
@@ -1564,7 +1575,7 @@ border-radius: 1rem;">
                                                             }
                                                         </style>
                                                         <div style="text-align: center;">
-                                                            <a href="#" target="_self"
+                                                            <a href="#comprar-contraentrega" target="_self"
                                                                 class="theme-button hvr-rectangle-out  border-color-primary "
                                                                 style="font-size: 25px; 
                                  color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
@@ -1572,7 +1583,7 @@ border-radius: 1rem;">
                                  width: auto;
                                  
                                  border-radius: 47px;">
-                                                                <span class=""  id="comprar">
+                                                                <span class="" id="comprar">
                                                                     COMPRAR CONTRAENTREGA</span>
                                                             </a>
                                                         </div>
@@ -1659,31 +1670,33 @@ border-radius: 1rem;">
                  top: 0px;
                  
                  ">
-                  
-                <div class="widget-row ">
-                    <div class="widget 
-                          widgetResponsive textWidget headingWidget col20" id="heading-widget-1695571747448" data-type="HeadingWidget"
-                        data-delay="" data-animation-duration="" data-animation-delay="" data-animation="lazyAnimation-"
-                        style="margin-top: 0%; margin-left: 0%;">
-                        <div class="text-widget-content">
-                            <h4 style="text-align: left; font-size: 15px !important;">
-                                <div style="text-align: center;"><span
-                                        style="font-size: 24px; background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); font-family: Cottorway;"><span
-                                            style="font-size: 28px;">Su diseño compacto y ligero, junto
-                                            con su sonido estéreo de alta calidad</span><br><span
-                                            style="font-size: 28px;"></span></span><span
-                                        style="background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); font-family: Cottorway; font-size: 28px;">y
-                                        bajos profundos, los hacen ideales para tus actividades
-                                        diarias.</span></div>
-                            </h4>
-                        </div>
-                    </div>
-                </div>
+
+                                <div class="widget-row ">
+                                    <div class="widget 
+                          widgetResponsive textWidget headingWidget col20" id="heading-widget-1695571747448"
+                                        data-type="HeadingWidget" data-delay="" data-animation-duration=""
+                                        data-animation-delay="" data-animation="lazyAnimation-"
+                                        style="margin-top: 0%; margin-left: 0%;">
+                                        <div class="text-widget-content">
+                                            <h4 style="text-align: left; font-size: 15px !important;">
+                                                <div style="text-align: center;" id="comprar-contraentrega2"><span
+                                                        style="font-size: 24px; background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); font-family: Cottorway;"><span
+                                                            style="font-size: 28px;">Su diseño compacto y ligero, junto
+                                                            con su sonido estéreo de alta calidad</span><br><span
+                                                            style="font-size: 28px;"></span></span><span
+                                                        style="background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); font-family: Cottorway; font-size: 28px;">y
+                                                        bajos profundos, los hacen ideales para tus actividades
+                                                        diarias.</span></div>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="widget-row with-centered-content">
                                     <div class="widget 
                                                                       widgetResponsive textWidget headingWidget col13"
-                                        id="heading-widget-1695571747449" data-type="HeadingWidget" data-delay="" data-animation-duration=""
-                                        data-animation-delay="" data-animation="lazyAnimation-" style="margin-top: 0px; margin-left: 0px;">
+                                        id="heading-widget-1695571747449" data-type="HeadingWidget" data-delay=""
+                                        data-animation-duration="" data-animation-delay=""
+                                        data-animation="lazyAnimation-" style="margin-top: 0px; margin-left: 0px;">
                                         <div class="text-widget-content">
                                             <h2 style="text-align: center; margin-top: 1rem;"><span class=""
                                                     style="color: rgb(255, 255, 255); font-size: 48px; font-family: &quot;Cottorway Xtra Bold&quot;;">
@@ -1969,7 +1982,7 @@ border-radius: 1rem;">
                                                             }
                                                         </style>
                                                         <div style="text-align: center;">
-                                                            <a href="#" target="_self"
+                                                            <a href="#comprar-contraentrega" target="_self"
                                                                 class="theme-button hvr-rectangle-out  border-color-primary "
                                                                 style="font-size: 22px; 
                              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
@@ -2189,7 +2202,7 @@ border-radius: 1rem;">
                                                 }
                                             </style>
                                             <div style="text-align: center;">
-                                                <a href="#comprar" target="_self"
+                                                <a href="#comprar-contraentrega2" target="_self"
                                                     class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 22px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 12px 24px;
@@ -3013,7 +3026,7 @@ border-radius: 1rem;">
                                                 }
                                             </style>
                                             <div style="text-align: center;">
-                                                <a href="#comprar" target="_self"
+                                                <a href="#comprar-contraentrega2" target="_self"
                                                     class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 15px 30px;
@@ -3410,7 +3423,7 @@ border-radius: 1rem;">
                                                 }
                                             </style>
                                             <div style="text-align: center;">
-                                                <a href="#comprar" target="_self"
+                                                <a href="#comprar-contraentrega" target="_self"
                                                     class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
                              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
                              padding: 15px 30px;
@@ -3667,7 +3680,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 15px 30px;
@@ -3780,7 +3793,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 22px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 12px 24px;
@@ -4315,7 +4328,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 15px 30px;
@@ -4514,7 +4527,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega2" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 22px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 12px 24px;
@@ -4981,7 +4994,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-primary " style="font-size: 25px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 15px 30px;
@@ -5082,7 +5095,7 @@ border-radius: 1rem;">
                                             }
                                         </style>
                                         <div style="text-align: center;">
-                                            <a href="#oferta" target="_self"
+                                            <a href="#comprar-contraentrega2" target="_self"
                                                 class="theme-button hvr-rectangle-out  border-color-secondary1 " style="font-size: 22px; 
              color:#ffffff;font-family:'Cottorway Xtra Bold';background-color: transparent;letter-spacing:0px;border-width: 3px;
              padding: 12px 24px;
@@ -5406,16 +5419,16 @@ border-radius: 1rem;">
                                     }
                                 </style>
                                 <div class="col20 f-left" style="text-align: center">
-                                    <a class="social-media-button slow-transition-bg" href="https://wa.link/ntopcq"
-                                        target="_blank">
+                                    <a class="social-media-button slow-transition-bg"
+                                        href="https://api.whatsapp.com/send?phone=573054764557" target="_blank">
                                         <i class="fa fa-whatsapp color-secondary4"></i>
                                     </a>
                                     <a class="social-media-button slow-transition-bg"
-                                        href="https://instagram.com/bioboosters" target="_blank">
+                                        href="https://www.instagram.com/stockycolombia/" target="_blank">
                                         <i class="fa fa-instagram color-secondary4"></i>
                                     </a>
                                     <a class="social-media-button slow-transition-bg"
-                                        href="https://instagram.com/bioboosters" target="_blank">
+                                        href="https://www.tiktok.com/@stocky_colombia" target="_blank">
                                         <i class="fa fa-tiktok color-secondary4"></i>
                                     </a>
                                     <!-- <a class="social-media-button slow-transition-bg"
@@ -5591,16 +5604,16 @@ border-radius: 1rem;">
                                     }
                                 </style>
                                 <div class="col20 f-left" style="text-align: center">
-                                    <a class="social-media-button slow-transition-bg" href="https://wa.link/ntopcq"
-                                        target="_blank">
+                                    <a class="social-media-button slow-transition-bg"
+                                        href="https://api.whatsapp.com/send?phone=573054764557" target="_blank">
                                         <i class="fa fa-whatsapp color-secondary4"></i>
                                     </a>
                                     <a class="social-media-button slow-transition-bg"
-                                        href="https://instagram.com/bioboosters" target="_blank">
+                                        href="https://www.instagram.com/stockycolombia/" target="_blank">
                                         <i class="fa fa-instagram color-secondary4"></i>
                                     </a>
                                     <a class="social-media-button slow-transition-bg"
-                                        href="https://instagram.com/bioboosters" target="_blank">
+                                        href="https://www.tiktok.com/@stocky_colombia" target="_blank">
                                         <i class="fa fa-tiktok color-secondary4"></i>
                                     </a>
 
@@ -6029,62 +6042,62 @@ border-radius: 1rem;">
             }
             console.log('Updated array:', arrayProduct);
         }
-  
+
         function showPurchaseForm() {
-         clearPopupContent();
+            clearPopupContent();
 
-        const formTitle = document.createElement('h2');
-        formTitle.textContent = 'Formulario de Compra';
-        formTitle.style.textAlign = "center";
-        formTitle.style.marginBottom = "1rem";
-        formTitle.style.fontWeight = "bold";
-        popupImages.appendChild(formTitle);
+            const formTitle = document.createElement('h2');
+            formTitle.textContent = 'Formulario de Compra';
+            formTitle.style.textAlign = "center";
+            formTitle.style.marginBottom = "1rem";
+            formTitle.style.fontWeight = "bold";
+            popupImages.appendChild(formTitle);
 
-        const form = document.createElement('form');
+            const form = document.createElement('form');
 
-        const fields = [
-            { label: 'Nombre Completo', type: 'text', id: 'nombres' },
-            { label: 'Apellido', type: 'text', id: 'apellidos' },
-            { label: 'Correo Electrónico', type: 'email', id: 'correo' },
-            { label: 'Dirección', type: 'text', id: 'direccion' },
-            { label: 'Ciudad', type: 'text', id: 'ciudad' },
-            { label: 'Departamento', type: 'text', id: 'departamento' },
-            { label: 'Barrio', type: 'text', id: 'barrio' },
-            { label: 'Teléfono', type: 'tel', id: 'celular' },
-            { label: 'Nota del Pedido', type: 'text', id: 'notas' }
-        ];
+            const fields = [
+                { label: 'Nombre Completo', type: 'text', id: 'nombres' },
+                { label: 'Apellido', type: 'text', id: 'apellidos' },
+                { label: 'Correo Electrónico', type: 'email', id: 'correo' },
+                { label: 'Dirección', type: 'text', id: 'direccion' },
+                { label: 'Ciudad', type: 'text', id: 'ciudad' },
+                { label: 'Departamento', type: 'select', id: 'departamento' },
+                { label: 'Barrio', type: 'text', id: 'barrio' },
+                { label: 'Teléfono', type: 'tel', id: 'celular' },
+                { label: 'Nota del Pedido', type: 'text', id: 'notas' }
+            ];
 
-        fields.forEach(field => {
-            const fieldContainer = createInputField(field.label, field.type, field.id);
-            form.appendChild(fieldContainer);
-        });
+            fields.forEach(field => {
+                const fieldContainer = createInputField(field.label, field.type, field.id);
+                form.appendChild(fieldContainer);
+            });
 
-        const submitButton = document.createElement('button');
-        submitButton.type = 'submit';
-        submitButton.textContent = 'Confirmar Compra';
-        submitButton.style.fontSize = '22px';
-        submitButton.style.color = '#ffffff';
-        submitButton.style.fontFamily = "'Cottorway Xtra Bold'";
-        submitButton.style.backgroundColor = 'rgba(137, 35, 255, 1)';
-        submitButton.style.borderColor = 'rgba(137, 35, 255, 1)';
-        submitButton.style.letterSpacing = '0px';
-        submitButton.style.borderWidth = '3px';
-        submitButton.style.padding = '12px 24px';
-        submitButton.style.width = 'auto';
-        submitButton.style.borderRadius = '47px';
-        submitButton.style.cursor = 'pointer';
-        submitButton.style.marginTop = '20px';
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Confirmar Compra';
+            submitButton.style.fontSize = '22px';
+            submitButton.style.color = '#ffffff';
+            submitButton.style.fontFamily = "'Cottorway Xtra Bold'";
+            submitButton.style.backgroundColor = 'rgba(137, 35, 255, 1)';
+            submitButton.style.borderColor = 'rgba(137, 35, 255, 1)';
+            submitButton.style.letterSpacing = '0px';
+            submitButton.style.borderWidth = '3px';
+            submitButton.style.padding = '12px 24px';
+            submitButton.style.width = 'auto';
+            submitButton.style.borderRadius = '47px';
+            submitButton.style.cursor = 'pointer';
+            submitButton.style.marginTop = '20px';
 
-        // Añadir evento para manejar el envío del formulario
-        submitButton.addEventListener('click', function (event) {
-            event.preventDefault(); // Evita que el formulario se envíe de manera predeterminada
-            crearorden(); // Llama a la función para crear la orden
-        });
+            // Añadir evento para manejar el envío del formulario
+            submitButton.addEventListener('click', function (event) {
+                event.preventDefault(); // Evita que el formulario se envíe de manera predeterminada
+                crearorden(); // Llama a la función para crear la orden
+            });
 
-        form.appendChild(submitButton);
+            form.appendChild(submitButton);
 
-        popupImages.appendChild(form);
-    }
+            popupImages.appendChild(form);
+        }
 
         function createInputField(labelText, inputType, inputId) {
             const fieldContainer = document.createElement('div');
@@ -6113,66 +6126,95 @@ border-radius: 1rem;">
         }
 
         function crearorden() {
-                const myHeaders = new Headers();
-                myHeaders.append("x-api-key", "OhnnILQdYFQjaePagghzG7EKnIcSt7qjgYD3Qa0bbG0=");
-                myHeaders.append("x-secret", "b7e49cfa3db4dfe8ebae7cd052996011713f186e5fa51bb706c574bf08aa922a3b20015ffb594c68281b72df3e3d9f7f25651283042e72da2cdcead1eb84b185.f71dddc43729ad31");
-                myHeaders.append("Content-Type", "application/json");
+            const myHeaders = new Headers();
+            myHeaders.append("x-api-key", "OhnnILQdYFQjaePagghzG7EKnIcSt7qjgYD3Qa0bbG0=");
+            myHeaders.append("x-secret", "b7e49cfa3db4dfe8ebae7cd052996011713f186e5fa51bb706c574bf08aa922a3b20015ffb594c68281b72df3e3d9f7f25651283042e72da2cdcead1eb84b185.f71dddc43729ad31");
+            myHeaders.append("Content-Type", "application/json");
 
-                // Obtener valores de los inputs
-                const departamento = document.getElementById('departamento').value;
-                const ciudad = document.getElementById('ciudad').value;
-                const direccion = document.getElementById('direccion').value;
-                const barrio = document.getElementById('barrio').value;
-                const notas = document.getElementById('notas').value;
-                const nombres = document.getElementById('nombres').value;
-                const apellidos = document.getElementById('apellidos').value;
-                const celular = document.getElementById('celular').value;
-                const correo = document.getElementById('correo').value;
+            // Obtener valores de los inputs
+            const departamento = document.getElementById('departamento').value;
+            const ciudad = document.getElementById('ciudad').value;
+            const direccion = document.getElementById('direccion').value;
+            const barrio = document.getElementById('barrio').value;
+            const notas = document.getElementById('notas').value;
+            const nombres = document.getElementById('nombres').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const celular = document.getElementById('celular').value;
+            const correo = document.getElementById('correo').value;
 
-                // Crear el objeto raw
-                const raw = {
-                    name: nombres,
-                    lastName: apellidos,
-                    email: correo,
-                    courrier: "Servientrega",
-                    listBlackCourriers: ["tcc"],
-                    free_shipping: true,
-                    isDropshipping: true,
-                    validateAddress: false,
-                    validateReturns: false,
-                    validateDuplicate: false,
-                    destinationBilling: {
-                        address: direccion,
-                        city: ciudad,
-                        department: departamento,
-                        neighborhood: barrio,
-                        phone: celular
-                    },
-                    products: arrayProduct.map(product => ({
-                        identifier: product.id,
-                        quantity: product.quantity,
-                        price: 65000
-                    })),
-                    note: notas
-                };
+            // Crear el objeto raw
+            const raw = {
+                name: nombres,
+                lastName: apellidos,
+                email: correo,
+                courrier: "Servientrega",
+                listBlackCourriers: ["tcc"],
+                free_shipping: true,
+                isDropshipping: true,
+                validateAddress: false,
+                validateReturns: false,
+                validateDuplicate: false,
+                destinationBilling: {
+                    address: direccion,
+                    city: ciudad,
+                    department: departamento,
+                    neighborhood: barrio,
+                    phone: celular
+                },
+                products: arrayProduct.map(product => ({
+                    identifier: product.id,
+                    quantity: product.quantity,
+                    price: 60000
+                })),
+                note: notas
+            };
 
-                console.log(raw);
+            console.log(JSON.stringify(raw));
 
-                return
+            return
 
-                // Enviar la solicitud POST
-                const requestOptions = {
-                    method: "POST",
-                    headers: myHeaders,
-                    body: JSON.stringify(raw), // Convertir el objeto raw a JSON
-                    redirect: "follow"
-                };
+            // Enviar la solicitud POST
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(raw), // Convertir el objeto raw a JSON
+                redirect: "follow"
+            };
 
-                fetch("https://ms-public-api.rocketfy.com/rocketfy/api/v1/orders", requestOptions)
-                    .then(response => response.text())
-                    .then(result => console.log(result))
-                    .catch(error => console.error('Error:', error));
-            }
+            fetch("https://ms-public-api.rocketfy.com/rocketfy/api/v1/orders", requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok.');
+                    }
+                    return response.text();
+                })
+                .then(result => {
+                    console.log(result);
+                    clearPopupContent();
+
+                    const thankYouMessage = document.createElement('p');
+                    thankYouMessage.textContent = '¡Gracias por tu compra! El pago se realizará contra entrega y tu pedido será enviado a la dirección que proporcionaste, recuerda que el envío es gratis. Te enviaremos el número de guía y el seguimiento de tu pedido para que estés al tanto. ¡Gracias!';
+                    thankYouMessage.style.fontSize = '18px';
+                    thankYouMessage.style.textAlign = 'center';
+                    thankYouMessage.style.margin = '20px';
+
+                    popupImages.appendChild(thankYouMessage);
+
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                    }, 6000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearPopupContent();
+                    const errorMessage = document.createElement('p');
+                    errorMessage.textContent = 'Hubo un error al procesar tu compra. Por favor, intenta nuevamente más tarde.';
+                    errorMessage.style.fontSize = '18px';
+                    errorMessage.style.textAlign = 'center';
+                    errorMessage.style.margin = '20px';
+                    popupImages.appendChild(errorMessage);
+                });
+        }
 
 
     </script>
