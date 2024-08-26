@@ -877,7 +877,7 @@
             data-animation="lazyAnimation-" style="margin-top: 0%; margin-left: 0%;">
             <div class="text-widget-content">
                 <h2 style="text-align: center;"><span
-                        style="color: rgb(255, 255, 255); font-family: Cottorway; font-size: 54px;">Auriculares
+                        style="color: rgb(255, 255, 255); font-family: Cottorway; font-size: 40px !important;">Auriculares
                         Inalámbricos Air31</span></h2>
             </div>
         </div>
@@ -1346,7 +1346,7 @@
                  top: 0px;
                  
                  ">
-                                <div class="widget-row product-stocky" id="product-stocky-2106780" style="border: 3px solid rgba(136, 59, 255, 1);
+                                <div class="widget-row product-stocky" id="product-stocky-474563" style="border: 3px solid rgba(136, 59, 255, 1);
 border-radius: 1rem;">
                                     <div class="widget 
          anim-delayed-item widgetResponsive imageWidget col20" id="image-widget-1695571747446" data-type="ImageWidget"
@@ -1711,7 +1711,7 @@ border-radius: 1rem;">
                                         data-animation="lazyAnimation-" style="margin-top: 0px; margin-left: 0px;">
                                         <div class="text-widget-content">
                                             <h2 style="text-align: center; margin-top: 1rem;"><span class=""
-                                                    style="color: rgb(255, 255, 255); font-size: 48px; font-family: &quot;Cottorway Xtra Bold&quot;;">
+                                                    style="color: rgb(255, 255, 255); font-size: 35px !important; font-family: &quot;Cottorway Xtra Bold&quot;;">
                                                     Selecciona tus colores favoritos</span></h2>
                                         </div>
                                     </div>
@@ -1730,7 +1730,7 @@ border-radius: 1rem;">
                  top: 0px;
                  
                  ">
-                                <div class="widget-row product-stocky" id="product-stocky-2106780" style="border: 3px solid rgba(136, 59, 255, 1);
+                                <div class="widget-row product-stocky" id="product-stocky-474563" style="border: 3px solid rgba(136, 59, 255, 1);
 border-radius: 1rem;">
                                     <div class="widget 
          mobile-only anim-delayed-item widgetResponsive imageWidget col20" id="image-widget-1695931707987"
@@ -5923,6 +5923,7 @@ border-radius: 1rem;">
         const popup = document.getElementById('popup');
         const popupImages = document.getElementById('popup-images');
         const closePopup = document.getElementById('close-popup');
+
         const comprarButton = document.querySelectorAll('#comprar');
 
         document.querySelectorAll('[id^="product-stocky"]').forEach(element => {
@@ -6066,6 +6067,7 @@ border-radius: 1rem;">
             popupImages.appendChild(formTitle);
 
             const form = document.createElement('form');
+            form.id = 'purchaseForm';
 
             const fields = [
                 { label: 'Nombre Completo', type: 'text', id: 'nombres' },
@@ -6076,11 +6078,11 @@ border-radius: 1rem;">
                 { label: 'Departamento', type: 'select', id: 'departamento' },
                 { label: 'Barrio', type: 'text', id: 'barrio' },
                 { label: 'Teléfono', type: 'tel', id: 'celular' },
-                { label: 'Nota del Pedido', type: 'text', id: 'notas' }
+                { label: 'Nota del Pedido', type: 'text', id: 'notas', placeholder: 'Ejemplo: Al lado del centro comercial ...' }
             ];
 
             fields.forEach(field => {
-                const fieldContainer = createInputField(field.label, field.type, field.id);
+                const fieldContainer = createInputField(field.label, field.type, field.id, field.placeholder);
                 form.appendChild(fieldContainer);
             });
 
@@ -6102,16 +6104,17 @@ border-radius: 1rem;">
 
             // Añadir evento para manejar el envío del formulario
             submitButton.addEventListener('click', function (event) {
-                event.preventDefault(); // Evita que el formulario se envíe de manera predeterminada
-                crearorden(); // Llama a la función para crear la orden
+                event.preventDefault();
+                if (validateForm()) {
+                    crearorden();
+                }
             });
 
             form.appendChild(submitButton);
-
             popupImages.appendChild(form);
         }
 
-        function createInputField(labelText, inputType, inputId) {
+        function createInputField(labelText, inputType, inputId, placeholder = '') {
             const fieldContainer = document.createElement('div');
             fieldContainer.style.marginBottom = '15px';
 
@@ -6121,16 +6124,88 @@ border-radius: 1rem;">
             label.style.marginBottom = '5px';
             fieldContainer.appendChild(label);
 
-            const input = document.createElement('input');
-            input.type = inputType;
-            input.id = inputId; // Asignar el ID al input
-            input.style.width = '100%';
-            input.style.padding = '8px';
-            input.style.border = '1px solid #ccc';
-            input.style.borderRadius = '4px';
-            fieldContainer.appendChild(input);
+            if (inputType === 'select') {
+                const select = document.createElement('select');
+                select.id = inputId;
+                select.required = true;
+                select.style.width = '100%';
+                select.style.padding = '8px';
+                select.style.border = '1px solid #ccc';
+                select.style.borderRadius = '4px';
+
+                // Opciones para el campo "Departamento"
+                const departamentos = [
+                    { nombre: 'Antioquia', valor: 'Antioquia' },
+                    { nombre: 'Atlántico', valor: 'Atlantico' },
+                    { nombre: 'Bolívar', valor: 'Bolivar' },
+                    { nombre: 'Boyacá', valor: 'Boyaca' },
+                    { nombre: 'Caldas', valor: 'Caldas' },
+                    { nombre: 'Cauca', valor: 'Cauca' },
+                    { nombre: 'Cesar', valor: 'Cesar' },
+                    { nombre: 'Córdoba', valor: 'Cordoba' },
+                    { nombre: 'Cundinamarca', valor: 'Cundinamarca' },
+                    { nombre: 'Huila', valor: 'Huila' },
+                    { nombre: 'La Guajira', valor: 'La_guajira' },
+                    { nombre: 'Magdalena', valor: 'Magdalena' },
+                    { nombre: 'Meta', valor: 'Meta' },
+                    { nombre: 'Nariño', valor: 'Narino' },
+                    { nombre: 'Norte de Santander', valor: 'Norte_de_santander' },
+                    { nombre: 'Quindío', valor: 'Quindio' },
+                    { nombre: 'Risaralda', valor: 'Risaralda' },
+                    { nombre: 'Santander', valor: 'Santander' },
+                    { nombre: 'Sucre', valor: 'Sucre' },
+                    { nombre: 'Tolima', valor: 'Tolima' },
+                    { nombre: 'Valle del Cauca', valor: 'Valle_del_cauca' }
+                ];
+
+                departamentos.forEach(departamento => {
+                    const option = document.createElement('option');
+                    option.value = departamento.valor;
+                    option.textContent = departamento.nombre;
+                    select.appendChild(option);
+                });
+
+                fieldContainer.appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.required = true;
+                input.id = inputId;
+                input.style.width = '100%';
+                input.style.padding = '8px';
+                input.style.border = '1px solid #ccc';
+                input.style.borderRadius = '4px';
+
+                // Asignar el placeholder si está disponible
+                if (placeholder) {
+                    input.placeholder = placeholder;
+                }
+
+                fieldContainer.appendChild(input);
+            }
 
             return fieldContainer;
+        }
+
+        function validateForm() {
+            const form = document.getElementById('purchaseForm');
+            const fields = form.querySelectorAll('input, select');
+            let isValid = true;
+
+            fields.forEach(field => {
+                if (field.value.trim() === '') {
+                    isValid = false;
+                    field.style.borderColor = 'red';
+                } else {
+                    field.style.borderColor = '#ccc';
+                }
+            });
+
+            if (!isValid) {
+                alert('Por favor, completa todos los campos obligatorios.');
+            }
+
+            return isValid;
         }
 
         function closePopupWindow() {
