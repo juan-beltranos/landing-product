@@ -795,6 +795,25 @@
     </style>
     <!-- CSS for Popup -->
     <style>
+        .floating-image {
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
         .popup {
             display: none;
             position: fixed;
@@ -925,7 +944,7 @@
       background-image: none;">
 
                         <div class="grid-content ">
-                            <div class="grid-column   grid-column-with-bg  has-bg-image  " style="width: 100%;
+                            <div class="grid-column   grid-column-with-bg  has-bg-image  floating-image" style="width: 100%;
                  padding-left:10%;padding-right:10%;background-color: transparent;
                  background-image: url('dist/images/auriculares-bluetooth-air31.png');
                  
@@ -1123,7 +1142,7 @@
       background-image: none;">
 
                         <div class="grid-content ">
-                            <div class="grid-column   grid-column-with-bg  has-bg-image  " style="width: 100%;
+                            <div class="grid-column   grid-column-with-bg  has-bg-image floating-image " style="width: 100%;
                  padding-left:0%;padding-right:0%;background-color: transparent;
                  background-image: url('dist/images/auriculares-bluetooth-air31.png');
                  
@@ -5727,7 +5746,7 @@ border-radius: 1rem;">
 
     </style>
 
-    <script type="text/javascript" src="https://static.web-repository.com/scripts/common/hit.js?v=1010"></script>
+    <!-- <script type="text/javascript" src="https://static.web-repository.com/scripts/common/hit.js?v=1010"></script> -->
 
 
     <script>
@@ -6003,7 +6022,6 @@ border-radius: 1rem;">
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 if (validateForm()) {
-                    clearPopupContent();
                     handleFormSubmit();
                 }
             });
