@@ -1,0 +1,58 @@
+{
+    "_id": "66e4d05274d0ed0c4ce7ce40",
+    "order_id": 332,
+    "billing": {
+        "full_name": "Gottfried",
+        "last_name": "Leibniz",
+        "email": "test@beispiel.de",
+        "phone": "030303986300",
+        "address": "Erfundene Straße 33",
+        "composed_address": {},
+        "country": "CO",
+        "cc": null,
+        "departament": "Tolima",
+        "city": {
+            "_id": "6047cb9b2a977165ccde90b0",
+            "name": "Ibague",
+            "state": {
+                "id": "6047cb912a977165ccde8ce7",
+                "name": "Tolima",
+                "code": "73"
+            },
+            "country": {
+                "id": "6047cb912a977165ccde8cd1",
+                "name": "Colombia",
+                "code": "COL"
+            },
+            "disabled": false,
+            "shop_error": false,
+            "forTest": true,
+            "city_code": "73001000"
+        },
+        "neighborhood": "valpa",
+        "geolocation": null
+    },
+    "total": 59000,
+    "rkfpayment": {
+        "rates": {
+            "rkf_charge": 0.0299,
+            "retefte": 0.015,
+            "reteica": 0.002,
+            "iva": 0.19,
+            "reteiva": 0.15,
+            "iva_rkf": 0.19
+        },
+        "exclude": {
+            "iva": true
+        },
+        "purchase_value": 59000,
+        "constant_fee": 900,
+        "total_before": 0,
+        "rkf_charge": 1764.1,
+        "retefte": 0,
+        "reteica": 0,
+        "iva": 0,
+        "reteiva": 0,
+        "iva_rkf": 506.179
+    }
+}

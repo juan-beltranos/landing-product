@@ -84,7 +84,7 @@ async function obtenerProductoPorID(productoID) {
 
 // FIREBASE
 
-async function registrarVentaAfiliado(data) {
+async function registrarVentaAfiliado(venta) {
     try {
         const idAfiliado = localStorage.getItem('afiliadoProducto');
         if (!idAfiliado || idAfiliado == 'null') {
@@ -92,8 +92,8 @@ async function registrarVentaAfiliado(data) {
             return;
         }
 
-        console.log(data);
-        
+        console.log(venta);
+
 
         // Obtener el ID del afiliado padre desde el documento del afiliado
         const afiliadoDoc = await getDoc(doc(db, 'afiliados', idAfiliado));
@@ -102,32 +102,9 @@ async function registrarVentaAfiliado(data) {
 
         // Crear la subcolección 'ventas' dentro del documento del afiliado
         const ventasRef = collection(db, 'afiliados', idAfiliado, 'ventas');
-        nuevaVenta = {
-            cantidad: carrito.reduce((sum, product) => sum + product.quantity, 0),
-
-            comisionStocky: afiliadoPadreID
-                ? (comision * carrito.reduce((sum, product) => sum + product.quantity, 0)) * 0.50
-                : comision * carrito.reduce((sum, product) => sum + product.quantity, 0),
-
-            comisionAfiliado: afiliadoPadreID
-                ? (comision * carrito.reduce((sum, product) => sum + product.quantity, 0)) * 0.45
-                : comision * carrito.reduce((sum, product) => sum + product.quantity, 0),
-
-            comisionAfiliadoPadre: afiliadoPadreID
-                ? (comision * carrito.reduce((sum, product) => sum + product.quantity, 0)) * 0.05
-                : 0,
-
-            fecha: new Date(),
-            urlProducto: window.location.href,
-            valorVenta: carrito.reduce((sum, product) => sum + (product.quantity * precio), 0),
-            afiliadoReferente: afiliadoPadreID ?? '',
-        };
 
 
-        return
-
-
-        await addDoc(ventasRef, nuevaVenta);
+        await addDoc(ventasRef, venta);
         // Actualizar las estadísticas de ventas generadas y comisión acumulada
         //  await actualizarVentasRealizadasEnFirebase(nuevaVenta.cantidad, nuevaVenta.comisionAfiliado, nuevaVenta.comisionAfiliadoPadre);
         console.assert("Venta Afiliado registrada en Firebase exitosamente");
@@ -230,7 +207,7 @@ async function crearOrden() {
             phone: telefono
         },
         products: carrito.map(product => ({
-            identifier: product.id,
+            identifier: String(product.id),
             quantity: product.cantidad,
             price: precio
         })),
@@ -240,10 +217,67 @@ async function crearOrden() {
     document.querySelector('#carrito-items').innerHTML = ''
     document.querySelector('#carrito-items').textContent = 'Creando tu pedido...'
 
-    registrarVentaAfiliado(123456)
-    console.log(raw);
+    let venta = {
+        "_id": "66e4d05274d0ed0c4ce7ce40",
+        "order_id": 332,
+        "billing": {
+            "full_name": "Gottfried",
+            "last_name": "Leibniz",
+            "email": "test@beispiel.de",
+            "phone": "030303986300",
+            "address": "Erfundene Straße 33",
+            "composed_address": {},
+            "country": "CO",
+            "cc": null,
+            "departament": "Tolima",
+            "city": {
+                "_id": "6047cb9b2a977165ccde90b0",
+                "name": "Ibague",
+                "state": {
+                    "id": "6047cb912a977165ccde8ce7",
+                    "name": "Tolima",
+                    "code": "73"
+                },
+                "country": {
+                    "id": "6047cb912a977165ccde8cd1",
+                    "name": "Colombia",
+                    "code": "COL"
+                },
+                "disabled": false,
+                "shop_error": false,
+                "forTest": true,
+                "city_code": "73001000"
+            },
+            "neighborhood": "valpa",
+            "geolocation": null
+        },
+        "total": 59000,
+        "rkfpayment": {
+            "rates": {
+                "rkf_charge": 0.0299,
+                "retefte": 0.015,
+                "reteica": 0.002,
+                "iva": 0.19,
+                "reteiva": 0.15,
+                "iva_rkf": 0.19
+            },
+            "exclude": {
+                "iva": true
+            },
+            "purchase_value": 59000,
+            "constant_fee": 900,
+            "total_before": 0,
+            "rkf_charge": 1764.1,
+            "retefte": 0,
+            "reteica": 0,
+            "iva": 0,
+            "reteiva": 0,
+            "iva_rkf": 506.179
+        }
+    }
 
-    return
+
+    registrarVentaAfiliado(venta)
 
 
     // Enviar la solicitud POST
@@ -254,21 +288,25 @@ async function crearOrden() {
         redirect: "follow"
     };
 
+    return
+
     return fetch("https://ms-public-api.rocketfy.com/rocketfy/api/v1/orders", requestOptions)
         .then(response => {
             if (!response.ok) {
-                alert('Por favor, verifique que sus datos, tanto Departamento como Ciudad, coincidan y estén correctamente escritos.')
+                alert('Por favor, verifique que sus datos, tanto Departamento como Ciudad, coincidan y estén correctamente escritos.');
                 throw new Error('Network response was not ok.');
             }
+
+            return response.json();
         })
         .then(result => {
-            console.log(result);
             registrarVentaAfiliado(result)
-            msgVentaExitosa()
+            msgVentaExitosa();
         })
         .catch(error => {
             console.error('Error:', error);
-        })
+        });
+
 
 
 }
@@ -545,9 +583,6 @@ function mostrarFormularioCarrito() {
     carritoItemsList.appendChild(formulario);
     modal.style.display = 'block';
 }
-
-
-
 
 function msgVentaExitosa() {
     document.querySelector('#carrito-items').innerHTML = ''
