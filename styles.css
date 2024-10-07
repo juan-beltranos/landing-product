@@ -312,7 +312,6 @@ ul {
   color: var(--font-color);
 }
 
-
 .siguiente-btn,
 .submit-btn {
   display: block;
@@ -432,7 +431,7 @@ textarea {
   float: left;
   padding: 7px 15px;
   font-size: 16px;
-  height: 37px;
+  height: auto;
   border: 1px solid #e2e2e2;
   background: #fff;
   margin-bottom: 6px;
@@ -440,3 +439,4 @@ textarea {
   border-radius: 3px;
   cursor: pointer;
 }
+

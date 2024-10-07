@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -21,7 +21,11 @@ let comision = 0
 let plataforma = ''
 let nuevaVenta = {}
 let atributos = []
+let variantes = []
+let precioProv = 0
 const modal = document.querySelector('.modal');
+
+let productData
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // FIREBASE
+
 async function obtenerProductoPorID(productoID) {
     document.querySelector('#spinner').style.display = 'flex';
     try {
@@ -57,8 +62,11 @@ async function obtenerProductoPorID(productoID) {
         const producto = await response.json();
         if (producto) {
             printHTML(producto[0]);
+            productData = producto[0]
             atributos = producto[0].attributes
             precio = producto[0].price
+            variantes = producto[0].variations[0]
+            // precioProv = producto[0].warehouse.warehouse_price
         } else {
             console.log("Producto no encontrado.");
         }
@@ -69,110 +77,205 @@ async function obtenerProductoPorID(productoID) {
     }
 }
 
-// async function crearVenta(raw, nuevaVenta) {
-//     const { courrier, free_shipping, isDropshipping, listBlackCourriers, validateAddress, validateDuplicate, validateReturns, ...datos } = raw;
-//     datos.plataforma = plataforma
-//     datos.infoVenta = nuevaVenta
-//     try {
-//         const ventasRef = collection(db, 'ventas');
-//         await addDoc(ventasRef, datos);
-//         msgVentaExitosa()
-//     } catch (error) {
-//         console.error("Error al registrar la venta en Firebase:", error);
-//     }
-// }
+function obtenerIdAfiliado() {
+    const idAfiliado = localStorage.getItem('afiliadoProducto');
+    if (!idAfiliado || idAfiliado === 'null') {
+        console.error("No se encontró el ID del afiliado");
+        return null;
+    }
+    return idAfiliado;
+}
 
-// FIREBASE
+async function obtenerConfiguracionGeneral() {
+    const configDocRef = doc(db, 'config', '0U4Ay0b1TlGi6rLw5sy3');
+    const configDoc = await getDoc(configDocRef);
 
-async function registrarVentaAfiliado(venta) {
+    if (!configDoc.exists()) {
+        console.error("No se encontró el documento de configuración");
+        return null;
+    }
+
+    return configDoc.data();
+}
+
+function calcularComisionVenta(totalAmount, comissionRate) {
+    if (typeof comissionRate !== 'number') {
+        console.error("El valor de la comisión por defecto no es un número");
+        return null;
+    }
+    return (totalAmount * comissionRate) / 100;
+}
+
+async function guardarVenta(venta, idAfiliado) {
     try {
-        const idAfiliado = localStorage.getItem('afiliadoProducto');
-        if (!idAfiliado || idAfiliado == 'null') {
-            console.error("No se encontró el ID del afiliado");
+        // Generar un ID único para la venta
+        const nuevaVentaId = doc(collection(db, 'afiliados', idAfiliado, 'ventas')).id;
+
+        // Referencia para la subcolección de ventas del afiliado
+        const ventasRef = doc(db, 'afiliados', idAfiliado, 'ventas', nuevaVentaId);
+        await setDoc(ventasRef, venta);
+
+        // Referencia para la colección general de ventas
+        const ventaGeneralRef = doc(db, 'ventas', nuevaVentaId);
+        await setDoc(ventaGeneralRef, venta);
+
+    } catch (error) {
+        console.error("Error al guardar la venta:", error);
+    }
+}
+
+async function obtenerDatosAfiliado(idAfiliado) {
+    const afiliadoRef = doc(db, 'afiliados', idAfiliado);
+    const afiliadoDoc = await getDoc(afiliadoRef);
+
+    if (!afiliadoDoc.exists()) {
+        console.error("No se encontró el documento del afiliado");
+        return null;
+    }
+
+    return afiliadoDoc.data();
+}
+
+async function actualizarDatosAfiliado(idAfiliado, nuevaComision, nuevaVenta) {
+    const afiliadoRef = doc(db, 'afiliados', idAfiliado);
+    await updateDoc(afiliadoRef, {
+        comisionAcumulada: nuevaComision,
+        ventasGeneradas: nuevaVenta
+    });
+}
+
+async function procesarComisionReferente(idAfiliado, venta) {
+    try {
+        // Obtener los datos del afiliado actual
+        const afiliadoRef = doc(db, 'afiliados', idAfiliado);
+        const afiliadoDoc = await getDoc(afiliadoRef);
+
+        if (!afiliadoDoc.exists()) {
+            console.error("No se encontró el documento del afiliado");
             return;
         }
 
-        console.log(venta);
-
-
-        // Obtener el ID del afiliado padre desde el documento del afiliado
-        const afiliadoDoc = await getDoc(doc(db, 'afiliados', idAfiliado));
         const afiliadoData = afiliadoDoc.data();
-        const afiliadoPadreID = afiliadoData?.afiliadoReferente;
+        const idAfiliadoReferente = afiliadoData.afiliadoReferente;
 
-        // Crear la subcolección 'ventas' dentro del documento del afiliado
-        const ventasRef = collection(db, 'afiliados', idAfiliado, 'ventas');
+        // Si no existe un afiliado referente, no se hace nada
+        if (!idAfiliadoReferente) {
+            return;
+        }
 
+        // Obtener el porcentaje de comisión para el afiliado referente
+        const configDocRef = doc(db, 'config', '0U4Ay0b1TlGi6rLw5sy3');
+        const configDoc = await getDoc(configDocRef);
 
-        await addDoc(ventasRef, venta);
-        // Actualizar las estadísticas de ventas generadas y comisión acumulada
-        //  await actualizarVentasRealizadasEnFirebase(nuevaVenta.cantidad, nuevaVenta.comisionAfiliado, nuevaVenta.comisionAfiliadoPadre);
-        console.assert("Venta Afiliado registrada en Firebase exitosamente");
+        if (!configDoc.exists()) {
+            console.error("No se encontró el documento de configuración");
+            return;
+        }
 
-        return nuevaVenta;
+        const comissionRateReferente = configDoc.data().default_comission_rate_referent;
+        if (typeof comissionRateReferente !== 'number') {
+            console.error("El valor de la comisión para el referente no es un número");
+            return;
+        }
+
+        // Calcular la comisión del referente
+        const comisionReferente = (venta.totalAmount * comissionRateReferente) / 100;
+
+        // Restar la comisión del referente de la comisión del afiliado actual
+        venta.comisionAfiliado -= comisionReferente;
+
+        // Actualizar la comisión del referente en su propio documento de afiliado
+        const referenteRef = doc(db, 'afiliados', idAfiliadoReferente);
+        const referenteDoc = await getDoc(referenteRef);
+
+        if (!referenteDoc.exists()) {
+            console.error("No se encontró el documento del afiliado referente");
+            return;
+        }
+
+        const referenteData = referenteDoc.data();
+        const comisionSubafiliadosActual = referenteData.comisionSubafiliados || 0;
+        const comisionAcumuladaReferenteActual = referenteData.comisionAcumulada || 0;
+        const ventasGeneradasReferenteActual = referenteData.ventasGeneradas || 0;
+
+        // Actualizar la comisión del subafiliado y la comisión acumulada del referente
+        await updateDoc(referenteRef, {
+            comisionSubafiliados: comisionSubafiliadosActual + comisionReferente,
+            comisionAcumulada: comisionAcumuladaReferenteActual + comisionReferente,
+            ventasGeneradas: ventasGeneradasReferenteActual + 1
+        });
+
+        // Actualizar la subcolección de subafiliados
+        const subafiliadoRef = doc(db, 'afiliados', idAfiliadoReferente, 'subAfiliados', idAfiliado);
+        // Actualizar los campos de la subcolección 'subafiliados'
+        await updateDoc(subafiliadoRef, {
+            comisionSubafiliados: comisionSubafiliadosActual + comisionReferente,
+            comisionAcumulada: comisionAcumuladaReferenteActual + comisionReferente,
+            ventasGeneradas: ventasGeneradasReferenteActual + 1
+        });
+
+        console.log(`Comisión de subafiliado actualizada para el afiliado referente: ${idAfiliadoReferente}`);
+
+    } catch (error) {
+        console.error("Error al procesar la comisión del afiliado referente:", error);
+    }
+}
+
+async function registrarVentaAfiliado(venta) {
+    try {
+        // Obtener ID del afiliado
+        const idAfiliado = obtenerIdAfiliado();
+        if (!idAfiliado) return;
+
+        // Obtener configuración general (comisión)
+        const configGeneral = await obtenerConfiguracionGeneral();
+        if (!configGeneral) return;
+
+        // Calcular la comisión de la venta
+        const comissionRate = configGeneral.default_comission_rate;
+        const comisionAfiliado = calcularComisionVenta(venta.totalAmount, comissionRate);
+        if (!comisionAfiliado) return;
+
+        // Calcular la comisión de la venta
+        const comissionRateRef = configGeneral.default_comission_rate_referent;
+        const comisionAfiliadoRef = calcularComisionVenta(venta.totalAmount, comissionRateRef);
+        if (!comisionAfiliadoRef) return;
+
+        // Asignar la comisión al objeto venta
+        venta.comisionAfiliado = comisionAfiliado;
+        venta.comisionReferente = comisionAfiliadoRef;
+
+        // Guardar la venta en la base de datos
+        await guardarVenta(venta, idAfiliado);
+
+        // Procesar comisión del afiliado referente si existe
+        await procesarComisionReferente(idAfiliado, venta);
+
+        // Obtener datos actuales del afiliado
+        const afiliadoData = await obtenerDatosAfiliado(idAfiliado);
+        if (!afiliadoData) return;
+
+        // Calcular nuevos valores de comisionAcumulada y ventasGeneradas
+        const nuevaComisionAcumulada = (afiliadoData.comisionAcumulada || 0) + venta.comisionAfiliado;
+        const nuevasVentasGeneradas = (afiliadoData.ventasGeneradas || 0) + 1;
+
+        // Actualizar los datos del afiliado
+        await actualizarDatosAfiliado(idAfiliado, nuevaComisionAcumulada, nuevasVentasGeneradas);
+
+        return venta;
 
     } catch (error) {
         console.error("Error al registrar la venta en Firebase:", error);
     }
 }
 
-async function actualizarVentasRealizadasEnFirebase(cantidadVenta, comisionVenta, comisionAfiliadoPadre) {
-    try {
-        const idAfiliado = localStorage.getItem('afiliadoProducto');
-        if (!idAfiliado || idAfiliado === 'null') {
-            console.error("No se encontró el ID del afiliado");
-            return;
-        }
-
-        // Referencia al documento del afiliado
-        const afiliadoRef = doc(db, 'afiliados', idAfiliado);
-        const afiliadoDoc = await getDoc(afiliadoRef);
-
-        if (afiliadoDoc.exists()) {
-            const data = afiliadoDoc.data();
-            const afiliadoPadre = data.afiliadoReferente;
-            const ventasGeneradasActuales = data.ventasGeneradas || 0;
-            const comisionAcumuladaActual = data.comisionAcumulada || 0;
-
-            // Actualizar los valores de ventas generadas y comisión acumulada
-            await updateDoc(afiliadoRef, {
-                ventasGeneradas: ventasGeneradasActuales + cantidadVenta,
-                comisionAcumulada: comisionAcumuladaActual + comisionVenta,
-            });
-
-            // Verificar que existe un afiliado padre
-            if (afiliadoPadre) {
-                // Consulta info afiliado padre
-                const afiliadoPadreRef = doc(db, 'afiliados', afiliadoPadre);
-                const afiliadoPadreDoc = await getDoc(afiliadoPadreRef);
-                if (afiliadoPadreDoc.exists()) {
-                    const comisionSubafiliadosPadre = afiliadoPadreDoc.data().comisionSubafiliados || 0;
-                    await updateDoc(afiliadoPadreRef, {
-                        comisionSubafiliados: comisionSubafiliadosPadre + comisionAfiliadoPadre,
-                    });
-
-                    console.log("Comisión del afiliado padre actualizada correctamente");
-                } else {
-                    console.log("No se encontró el documento del afiliado padre");
-                }
-            } else {
-                console.log("Este afiliado no tiene un afiliado padre");
-            }
-
-            console.log("Ventas generadas y comisión acumulada actualizadas correctamente");
-        } else {
-            console.log("No se encontró el documento del afiliado para actualizar");
-        }
-    } catch (error) {
-        console.error("Error al actualizar las estadísticas del afiliado en Firebase:", error);
-    }
-}
-
 async function crearOrden() {
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", "OhnnILQdYFQjaePagghzG7EKnIcSt7qjgYD3Qa0bbG0=");
-    myHeaders.append("x-secret", "b7e49cfa3db4dfe8ebae7cd052996011713f186e5fa51bb706c574bf08aa922a3b20015ffb594c68281b72df3e3d9f7f25651283042e72da2cdcead1eb84b185.f71dddc43729ad31");
-    myHeaders.append("Content-Type", "application/json");
+
+    const idAfiliado = localStorage.getItem('afiliadoProducto');
+    if (!idAfiliado || idAfiliado == 'null') {
+        console.error("No se encontró el ID del afiliado");
+        return;
+    }
 
     // Obtener valores de los inputs
     const departamento = document.getElementById('departamento').value;
@@ -190,15 +293,7 @@ async function crearOrden() {
         name: nombres,
         lastName: apellidos,
         email: correo,
-        courrier: "Interrapidisimo",
-        listBlackCourriers: [
-            "Tcc", "Servientrega", "Domina", "Envia"
-        ],
-        free_shipping: true,
-        isDropshipping: true,
-        validateAddress: false,
-        validateReturns: false,
-        validateDuplicate: false,
+        courrier: "",
         destinationBilling: {
             address: direccion,
             city: ciudad,
@@ -209,107 +304,31 @@ async function crearOrden() {
         products: carrito.map(product => ({
             identifier: String(product.id),
             quantity: product.cantidad,
-            price: precio
+            price: Number(precio)
         })),
-        note: notas
+        note: notas,
+        confirm: false,
+        date: Date().toString(),
+        state: 'Pendiente',
+        affiliate_id: idAfiliado,
+        totalAmount: carrito.reduce((total, product) => total + (precio * product.cantidad), 0)
     };
 
     document.querySelector('#carrito-items').innerHTML = ''
     document.querySelector('#carrito-items').textContent = 'Creando tu pedido...'
 
-    let venta = {
-        "_id": "66e4d05274d0ed0c4ce7ce40",
-        "order_id": 332,
-        "billing": {
-            "full_name": "Gottfried",
-            "last_name": "Leibniz",
-            "email": "test@beispiel.de",
-            "phone": "030303986300",
-            "address": "Erfundene Straße 33",
-            "composed_address": {},
-            "country": "CO",
-            "cc": null,
-            "departament": "Tolima",
-            "city": {
-                "_id": "6047cb9b2a977165ccde90b0",
-                "name": "Ibague",
-                "state": {
-                    "id": "6047cb912a977165ccde8ce7",
-                    "name": "Tolima",
-                    "code": "73"
-                },
-                "country": {
-                    "id": "6047cb912a977165ccde8cd1",
-                    "name": "Colombia",
-                    "code": "COL"
-                },
-                "disabled": false,
-                "shop_error": false,
-                "forTest": true,
-                "city_code": "73001000"
-            },
-            "neighborhood": "valpa",
-            "geolocation": null
-        },
-        "total": 59000,
-        "rkfpayment": {
-            "rates": {
-                "rkf_charge": 0.0299,
-                "retefte": 0.015,
-                "reteica": 0.002,
-                "iva": 0.19,
-                "reteiva": 0.15,
-                "iva_rkf": 0.19
-            },
-            "exclude": {
-                "iva": true
-            },
-            "purchase_value": 59000,
-            "constant_fee": 900,
-            "total_before": 0,
-            "rkf_charge": 1764.1,
-            "retefte": 0,
-            "reteica": 0,
-            "iva": 0,
-            "reteiva": 0,
-            "iva_rkf": 506.179
-        }
+    try {
+        registrarVentaAfiliado(raw)
+        msgVentaExitosa();
+    } catch (error) {
+        console.log(error);
     }
 
-
-    registrarVentaAfiliado(venta)
-
-
-    // Enviar la solicitud POST
-    const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify(raw),
-        redirect: "follow"
-    };
-
-    return
-
-    return fetch("https://ms-public-api.rocketfy.com/rocketfy/api/v1/orders", requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                alert('Por favor, verifique que sus datos, tanto Departamento como Ciudad, coincidan y estén correctamente escritos.');
-                throw new Error('Network response was not ok.');
-            }
-
-            return response.json();
-        })
-        .then(result => {
-            registrarVentaAfiliado(result)
-            msgVentaExitosa();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-
-
-
 }
+
+
+
+
 
 
 function printHTML(producto) {
@@ -396,81 +415,152 @@ function mostrarModalCarrito() {
 
     carritoItemsList.innerHTML = '';  // Limpiar la lista de artículos en el modal
 
-    // Iterar sobre los atributos
-    atributos.forEach(atributo => {
+    if (atributos.length > 0) {
+        // Iterar sobre los atributos
+        atributos.forEach(atributo => {
+            const subnameTitle = document.createElement('h2');
+            subnameTitle.textContent = `Selecciona El ${atributo.name} Y La Cantidad`;
+            carritoItemsList.appendChild(subnameTitle);
+
+            // Iterar sobre los items de cada atributo
+            atributo.items.forEach(item => {
+                if (item.checked) {
+                    const li = document.createElement('li');
+
+                    const button = document.createElement('button');
+                    button.textContent = item.name;
+                    button.id = item.id;
+                    button.classList.add('btn-atribute');
+
+                    // Crear contenedor de controles de cantidad (+ y -)
+                    const quantityContainer = document.createElement('div');
+                    quantityContainer.classList.add('quantity-controls');
+                    quantityContainer.style.display = 'none';  // Inicialmente oculto
+
+                    const minusButton = document.createElement('button');
+                    minusButton.textContent = '-';
+                    minusButton.classList.add('quantity-btn');
+
+                    const quantityText = document.createElement('span');
+                    quantityText.textContent = 1;  // Cantidad inicial
+                    quantityText.classList.add('quantity-text');
+
+                    const plusButton = document.createElement('button');
+                    plusButton.textContent = '+';
+                    plusButton.classList.add('quantity-btn');
+
+                    // Añadir funcionalidad a los botones de cantidad
+                    minusButton.addEventListener('click', function () {
+                        let currentQuantity = parseInt(quantityText.textContent);
+                        if (currentQuantity > 1) {
+                            quantityText.textContent = currentQuantity - 1;
+                            actualizarCarrito(item.id, parseInt(quantityText.textContent));
+                        }
+                    });
+
+                    plusButton.addEventListener('click', function () {
+                        let currentQuantity = parseInt(quantityText.textContent);
+                        quantityText.textContent = currentQuantity + 1;
+                        actualizarCarrito(item.id, parseInt(quantityText.textContent));
+                    });
+
+                    // Añadir los botones + y - al contenedor
+                    quantityContainer.appendChild(minusButton);
+                    quantityContainer.appendChild(quantityText);
+                    quantityContainer.appendChild(plusButton);
+
+                    // Función para alternar selección y mostrar/ocultar los controles de cantidad
+                    button.addEventListener('click', function () {
+                        button.classList.toggle('selected');
+                        if (button.classList.contains('selected')) {
+                            quantityContainer.style.display = 'block';  // Mostrar controles de cantidad
+                            agregarAlCarrito(item.id, parseInt(quantityText.textContent));  // Agregar producto al carrito
+                        } else {
+                            quantityContainer.style.display = 'none';  // Ocultar controles de cantidad
+                            removerDelCarrito(item.id);  // Quitar producto del carrito
+                        }
+                    });
+
+                    li.appendChild(button);
+                    li.appendChild(quantityContainer);  // Añadir los controles de cantidad al <li>
+                    carritoItemsList.appendChild(li);
+                }
+            });
+        });
+    } else {
         const subnameTitle = document.createElement('h2');
-        subnameTitle.textContent = `Selecciona El ${atributo.name} Y La Cantidad`;
+        subnameTitle.textContent = `Selecciona el producto y su cantidad`;
         carritoItemsList.appendChild(subnameTitle);
 
         // Iterar sobre los items de cada atributo
-        atributo.items.forEach(item => {
-            if (item.checked) {
-                const li = document.createElement('li');
+        const li = document.createElement('li');
 
-                const button = document.createElement('button');
-                button.textContent = item.name;
-                button.id = item.id;
-                button.classList.add('btn-atribute');
+        const button = document.createElement('button');
+        button.textContent = variantes.name;
+        button.id = variantes.variation_id;
+        button.classList.add('btn-atribute');
 
-                // Crear contenedor de controles de cantidad (+ y -)
-                const quantityContainer = document.createElement('div');
-                quantityContainer.classList.add('quantity-controls');
-                quantityContainer.style.display = 'none';  // Inicialmente oculto
+        // Crear contenedor de controles de cantidad (+ y -)
+        const quantityContainer = document.createElement('div');
+        quantityContainer.classList.add('quantity-controls');
+        quantityContainer.style.display = 'none';  // Inicialmente oculto
 
-                const minusButton = document.createElement('button');
-                minusButton.textContent = '-';
-                minusButton.classList.add('quantity-btn');
+        const minusButton = document.createElement('button');
+        minusButton.textContent = '-';
+        minusButton.classList.add('quantity-btn');
 
-                const quantityText = document.createElement('span');
-                quantityText.textContent = 1;  // Cantidad inicial
-                quantityText.classList.add('quantity-text');
+        const quantityText = document.createElement('span');
+        quantityText.textContent = 1;  // Cantidad inicial
+        quantityText.classList.add('quantity-text');
 
-                const plusButton = document.createElement('button');
-                plusButton.textContent = '+';
-                plusButton.classList.add('quantity-btn');
+        const plusButton = document.createElement('button');
+        plusButton.textContent = '+';
+        plusButton.classList.add('quantity-btn');
 
-                // Añadir funcionalidad a los botones de cantidad
-                minusButton.addEventListener('click', function () {
-                    let currentQuantity = parseInt(quantityText.textContent);
-                    if (currentQuantity > 1) {
-                        quantityText.textContent = currentQuantity - 1;
-                        actualizarCarrito(item.id, parseInt(quantityText.textContent));
-                    }
-                });
-
-                plusButton.addEventListener('click', function () {
-                    let currentQuantity = parseInt(quantityText.textContent);
-                    quantityText.textContent = currentQuantity + 1;
-                    actualizarCarrito(item.id, parseInt(quantityText.textContent));
-                });
-
-                // Añadir los botones + y - al contenedor
-                quantityContainer.appendChild(minusButton);
-                quantityContainer.appendChild(quantityText);
-                quantityContainer.appendChild(plusButton);
-
-                // Función para alternar selección y mostrar/ocultar los controles de cantidad
-                button.addEventListener('click', function () {
-                    button.classList.toggle('selected');
-                    if (button.classList.contains('selected')) {
-                        quantityContainer.style.display = 'block';  // Mostrar controles de cantidad
-                        agregarAlCarrito(item.id, parseInt(quantityText.textContent));  // Agregar producto al carrito
-                    } else {
-                        quantityContainer.style.display = 'none';  // Ocultar controles de cantidad
-                        removerDelCarrito(item.id);  // Quitar producto del carrito
-                    }
-                });
-
-                li.appendChild(button);
-                li.appendChild(quantityContainer);  // Añadir los controles de cantidad al <li>
-                carritoItemsList.appendChild(li);
+        // Añadir funcionalidad a los botones de cantidad
+        minusButton.addEventListener('click', function () {
+            let currentQuantity = parseInt(quantityText.textContent);
+            if (currentQuantity > 1) {
+                quantityText.textContent = currentQuantity - 1;
+                actualizarCarrito(variantes.variation_id, parseInt(quantityText.textContent));
             }
         });
-    });
+
+        plusButton.addEventListener('click', function () {
+            let currentQuantity = parseInt(quantityText.textContent);
+            quantityText.textContent = currentQuantity + 1;
+            actualizarCarrito(variantes.variation_id, parseInt(quantityText.textContent));
+        });
+
+        // Añadir los botones + y - al contenedor
+        quantityContainer.appendChild(minusButton);
+        quantityContainer.appendChild(quantityText);
+        quantityContainer.appendChild(plusButton);
+
+        // Función para alternar selección y mostrar/ocultar los controles de cantidad
+        button.addEventListener('click', function () {
+            button.classList.toggle('selected');
+            if (button.classList.contains('selected')) {
+                quantityContainer.style.display = 'block';  // Mostrar controles de cantidad
+                agregarAlCarrito(variantes.variation_id, parseInt(quantityText.textContent));  // Agregar producto al carrito
+            } else {
+                quantityContainer.style.display = 'none';  // Ocultar controles de cantidad
+                removerDelCarrito(variantes.variation_id);  // Quitar producto del carrito
+            }
+        });
+
+        li.appendChild(button);
+        li.appendChild(quantityContainer);  // Añadir los controles de cantidad al <li>
+        carritoItemsList.appendChild(li);
+    }
+
     const nextButton = document.createElement('button');
     nextButton.textContent = 'Siguiente';
     nextButton.classList.add('submit-btn');
-    nextButton.addEventListener('click', mostrarFormularioCarrito);
+    nextButton.addEventListener('click', () => {
+        if (carrito.length === 0) { return alert('Debe seleccionar el producto y su cantidad.') }
+        mostrarFormularioCarrito();
+    });
 
     carritoItemsList.appendChild(nextButton);
     modal.style.display = 'block';
