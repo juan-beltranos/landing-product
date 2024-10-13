@@ -341,7 +341,7 @@ async function crearOrden() {
 
     try {
         registrarVentaAfiliado(raw)
-        sendMail(raw)
+        //sendMail(raw)
         msgVentaExitosa();
     } catch (error) {
         console.log(error);
@@ -409,7 +409,6 @@ function convertirURLsEnElementos(texto) {
     });
 }
 
-
 function printHTML(producto) {
     console.log(producto);
 
@@ -456,7 +455,7 @@ function printHTML(producto) {
 
     <section class="warranty-section">
         <h2 id="tituloGarantia">Nuestra Garantía</h2>
-        <p id="descripcionGarantia">Contamos con ${producto.warranty} mes de Garantía</p>
+        <p id="descripcionGarantia">Contamos con ${producto.warranty} ${producto.warranty > 1 ? 'meses' : 'mes'} de Garantía</p>
     </section>
 
     <section class="shipping-section">
@@ -711,7 +710,7 @@ function mostrarFormularioCarrito() {
     // Crear campos del formulario
     const campos = [
         { placeholder: 'Nombres', type: 'text', name: 'nombres' },
-        { placeholder: 'Apellidos', type: 'text', name: 'apellidos' },
+        { placeholder: 'Apellidos', type: 'text', name: 'apellidos' }, // Cambié 'email' por 'text'
         { placeholder: 'Correo Electrónico', type: 'email', name: 'correo' },
         { placeholder: 'Teléfono', type: 'tel', name: 'telefono' },
         {
@@ -742,16 +741,18 @@ function mostrarFormularioCarrito() {
             });
         } else if (campo.type === 'textarea') {
             input = document.createElement('textarea');
-            input.style.width = '100%';  // Asegurar que el textarea ocupe todo el ancho
+            input.placeholder = 'Nota del Pedido, Ej : Al lado del centro comercial';
+            input.style.width = '100%';
+            input.required = false;
         } else {
             input = document.createElement('input');
             input.type = campo.type;
             input.placeholder = campo.placeholder;
+            input.required = true; // Solo los campos requeridos
         }
 
         input.name = campo.name;
         input.id = campo.name;
-        input.required = true;
 
         formulario.appendChild(input);
     });
@@ -767,10 +768,18 @@ function mostrarFormularioCarrito() {
         // Validación de campos vacíos
         const formValid = [...formulario.elements].every(input => input.checkValidity());
 
-        if (formValid) {
+        // Validación específica del teléfono
+        const telefonoInput = formulario.querySelector('input[name="telefono"]');
+        const telefonoValido = /^\d{10}$/.test(telefonoInput.value);
+
+        if (formValid && telefonoValido) {
             crearOrden();
         } else {
-            alert('Por favor, completa todos los campos obligatorios.');
+            let mensaje = 'Por favor, completa todos los campos obligatorios.';
+            if (!telefonoValido) {
+                mensaje += '\nEl teléfono debe contener exactamente 10 números.';
+            }
+            alert(mensaje);
             formulario.reportValidity();  // Resaltar los campos que faltan
         }
     });
