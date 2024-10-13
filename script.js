@@ -17,8 +17,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let carrito = [];
 let precio = 0
+let maneProduct = ''
 let comision = 0
 let plataforma = ''
+let telefonoAfiliado = ''
+let nombreAfiliado = ''
 let nuevaVenta = {}
 let atributos = []
 let variantes = []
@@ -42,12 +45,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Llamar la función para obtener y mostrar el producto
     if (proValue) {
         obtenerProductoPorID(localStorage.getItem('productoID'));
+        obtenerDataAfiliado(localStorage.getItem('afiliadoProducto'));
     } else {
         console.log("No se proporcionó ID de producto.");
     }
 });
 
 // FIREBASE
+
+async function obtenerDataAfiliado(afiliadoId) {
+    const afiliado = doc(db, 'afiliados', afiliadoId);
+    const afiliadoDoc = await getDoc(afiliado);
+
+    if (!afiliadoDoc.exists()) {
+        console.error("No se encontró el documento de configuración");
+        return;
+    }
+
+    telefonoAfiliado = afiliadoDoc.data().telefono;
+    nombreAfiliado = afiliadoDoc.data().nombre;
+    const whatsappLink = document.getElementById('whatsapp-link');
+    whatsappLink.href = `https://wa.me/${telefonoAfiliado}`;
+}
 
 async function obtenerProductoPorID(productoID) {
     document.querySelector('#spinner').style.display = 'flex';
@@ -66,6 +85,7 @@ async function obtenerProductoPorID(productoID) {
             atributos = producto[0].attributes
             precio = producto[0].price
             variantes = producto[0].variations[0]
+            maneProduct = producto[0].name
             // precioProv = producto[0].warehouse.warehouse_price
         } else {
             console.log("Producto no encontrado.");
@@ -262,6 +282,7 @@ async function registrarVentaAfiliado(venta) {
         // Actualizar los datos del afiliado
         await actualizarDatosAfiliado(idAfiliado, nuevaComisionAcumulada, nuevasVentasGeneradas);
 
+
         return venta;
 
     } catch (error) {
@@ -319,11 +340,34 @@ async function crearOrden() {
 
     try {
         registrarVentaAfiliado(raw)
+        sendMail(raw)
         msgVentaExitosa();
     } catch (error) {
         console.log(error);
     }
 
+}
+
+function sendMail(raw) {
+    try {
+        const totalQuantity = carrito.reduce((total, product) => total + product.cantidad, 0);
+        emailjs.send("service_ort2wvz", "template_g639s5i", {
+            to_name: raw.name + ' ' + raw.lastName,
+            from_name: 'Stocky Colombia',
+            quantity: totalQuantity,
+            nameProduct: maneProduct,
+            telefonoAfiliado: telefonoAfiliado,
+            nombreAfiliado: nombreAfiliado,
+            precio: precio,
+            total_amount: raw.totalAmount,
+            address: `${raw.destinationBilling.address}, ${raw.destinationBilling.neighborhood}, ${raw.destinationBilling.city}, ${raw.destinationBilling.department}`,
+            phone: raw.destinationBilling.phone,
+            note: raw.note,
+            reply_to: raw.email
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 
@@ -363,7 +407,7 @@ function printHTML(producto) {
     </section>
 
     <section class="description-general">
-    <h2>Descripcion Genreal</h2>
+    <h2>Descripcion General</h2>
         ${producto.description} 
         <button class="order-btn">Obtén el Tuyo</button>
     </section>
