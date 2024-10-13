@@ -282,6 +282,7 @@ async function registrarVentaAfiliado(venta) {
         // Actualizar los datos del afiliado
         await actualizarDatosAfiliado(idAfiliado, nuevaComisionAcumulada, nuevasVentasGeneradas);
 
+        carrito = []
 
         return venta;
 
@@ -374,15 +375,56 @@ function sendMail(raw) {
 
 
 
+function convertirURLsEnElementos(texto) {
+    // Expresiones regulares para detectar diferentes tipos de contenido
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
+    const youtubeShortsRegex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([\w-]{11})/;
+    const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?(?:vimeo\.com\/video\/|player\.vimeo\.com\/video\/)(\d+)/;
+    const gifRegex = /https?:\/\/.*\.(gif)/;
+    const imageRegex = /https?:\/\/.*\.(jpg|jpeg|png|webp)/;
+
+    return texto.replace(urlRegex, function (url) {
+        if (youtubeRegex.test(url)) {
+            const videoID = url.match(youtubeRegex)[1];
+            return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoID}?controls=0&modestbranding=1&rel=0&autohide=1&iv_load_policy=3&fs=0" frameborder="0" allowfullscreen></iframe>`;
+        }
+        if (youtubeShortsRegex.test(url)) {
+            const videoID = url.match(youtubeShortsRegex)[1];
+            return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoID}?controls=0&modestbranding=1&rel=0&autohide=1&iv_load_policy=3&fs=0" frameborder="0" allowfullscreen></iframe>`;
+        }
+        if (vimeoRegex.test(url)) {
+            const videoID = url.match(vimeoRegex)[1];
+            return `<iframe width="100%" height="400" src="https://player.vimeo.com/video/${videoID}?badge=0&autopause=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        }
+
+        if (gifRegex.test(url)) {
+            return `<img src="${url}" alt="GIF del producto" width="300" class="gif-producto">`;
+        }
+        if (imageRegex.test(url)) {
+            return `<img src="${url}" alt="imagen del producto" width="300">`;
+        }
+
+        return `<a href="${url}" target="_blank">${url}</a>`;
+    });
+}
+
 
 function printHTML(producto) {
     console.log(producto);
+
+    // Agregar SEO
+    SEO(producto)
+
+    // Agregar multimedia
+    const descripcionConElementos = convertirURLsEnElementos(producto.description);
+
     document.querySelector('#content').innerHTML = `
     <header class="hero-section">
         <h1>${producto.name}</h1>
         <img src="${producto.imagePrin.location}" alt="banner" width="350" id="bannerurl">
         <p class="price" id="price"> ${producto.price} </p>
-        <button class="order-btn">Comprar Ahora</button>
+        <button class="order-btn">COMPRAR AHORA</button>
         <ul class="features">
             <li>Envío gratis a toda Colombia</li>
             <li>Pago contraentrega</li>
@@ -392,7 +434,7 @@ function printHTML(producto) {
     <section class="colors-section">
         <h2 id="textoSelecciona"></h2>
         <div class="color-options" id="color-options"></div>
-        <button class="order-btn">Lo quiero!</button>
+        <button class="order-btn">LO QUIERO!</button>
     </section>
 
     <section class="battery-section">
@@ -407,20 +449,40 @@ function printHTML(producto) {
     </section>
 
     <section class="description-general">
-    <h2>Descripcion General</h2>
-        ${producto.description} 
+        <h2>Descripción General</h2>
+        ${descripcionConElementos}
         <button class="order-btn">Obtén el Tuyo</button>
     </section>
 
     <section class="warranty-section">
-        <h2 id="tituloGarantia">Nustra Garantía</h2>
+        <h2 id="tituloGarantia">Nuestra Garantía</h2>
         <p id="descripcionGarantia">Contamos con ${producto.warranty} mes de Garantía</p>
     </section>
 
-    `
+    <section class="shipping-section">
+        <img src="https://content.app-sources.com/s/34404626044879487/thumbnails/640x480/Images/Recurso_30-0217029.png?format=webp" alt="envío gratis">
+    </section>
+    `;
+
     actualizarOpcionesColor(producto);
     configurarCompraContraEntrega();
+}
 
+function SEO(producto) {
+    // Actualizar dinámicamente las etiquetas SEO en el <head>
+    document.title = `${producto.name} - Compra ahora a un precio increíble`;
+
+    // Meta descripción
+    document.querySelector('meta[name="description"]').setAttribute('content', `Compra ${producto.name}. Disfruta de ${producto.attributes.map(atr => atr.subname).join(', ')}. Envío gratis a toda Colombia y pago contra entrega.`);
+
+    // Meta keywords
+    document.querySelector('meta[name="keywords"]').setAttribute('content', `${producto.name}, compra auriculares, pago contra entrega, envío gratis, ${producto.attributes.map(atr => atr.subname).join(', ')}`);
+
+    // Open Graph tags
+    document.querySelector('meta[property="og:title"]').setAttribute('content', `${producto.name} - Compra ahora`);
+    document.querySelector('meta[property="og:description"]').setAttribute('content', `Compra ${producto.name} con características como ${producto.attributes.map(atr => atr.items.map(doc => doc.name).join(', ')).join(' ')} y envío gratis.`);
+    document.querySelector('meta[property="og:image"]').setAttribute('content', `${producto.imagePrin.location}`);
+    document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
 }
 
 function actualizarOpcionesColor(producto) {
@@ -719,11 +781,19 @@ function mostrarFormularioCarrito() {
 }
 
 function msgVentaExitosa() {
-    document.querySelector('#carrito-items').innerHTML = ''
-    document.querySelector('#carrito-items').textContent = 'Gracias por tu compra!'
-    // setTimeout(() => {
-    //     window.location.reload('/')
-    // }, 5000);
+    const carritoItems = document.querySelector('#carrito-items');
+    carritoItems.innerHTML = '';
+
+    const mensajeAgradecimiento = document.createElement('div');
+    mensajeAgradecimiento.classList.add('mensaje-exito');
+
+    mensajeAgradecimiento.innerHTML = `
+        <h2>¡Gracias por tu compra!</h2>
+        <p>Tu pedido ha sido procesado exitosamente.</p>
+        <p>Te enviaremos una notificación a tu correo electrónico con la información del envío.</p>
+        <p>¡Esperamos que disfrutes de tu nuevo producto!</p>
+    `;
+    carritoItems.appendChild(mensajeAgradecimiento);
 }
 
 function cerrarModal() {
