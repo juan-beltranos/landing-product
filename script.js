@@ -64,8 +64,8 @@ async function obtenerDataAfiliado(afiliadoId) {
 
     telefonoAfiliado = afiliadoDoc.data().telefono;
     nombreAfiliado = afiliadoDoc.data().nombre;
-    const whatsappLink = document.getElementById('whatsapp-link');
-    whatsappLink.href = `https://wa.me/+573124360543`;
+    // const whatsappLink = document.getElementById('whatsapp-link');
+    // whatsappLink.href = `https://wa.me/+573124360543`;
 }
 
 async function obtenerProductoPorID(productoID) {
