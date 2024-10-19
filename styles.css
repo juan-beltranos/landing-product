@@ -30,6 +30,7 @@ p {
 
 img {
   border-radius: 1rem;
+  width: 300px;
 }
 
 ul {
@@ -84,7 +85,7 @@ ul {
 .features {
   list-style-type: none;
   margin: 10px 0;
-  padding: 0;
+  padding: 5px;
 }
 .features li {
   margin: 5px 0;
@@ -100,7 +101,7 @@ ul {
 
 .color-options img,
 .feature-icons img {
-  width: 150px;
+  width: 250px;
   height: auto;
   cursor: pointer;
   border: 2px solid transparent;
@@ -198,6 +199,8 @@ ul {
 
 .social-links a {
   color: var(--primary-color);
+  font-size: 3rem;
+  text-decoration: none;
 }
 
 /* Responsive Styles */
@@ -209,6 +212,10 @@ ul {
   .icon-box {
     display: block;
     margin: 20px auto;
+  }
+
+  img {
+    width: 100%;
   }
 }
 
@@ -409,6 +416,16 @@ textarea {
   padding: 1rem;
   font-weight: bold;
   text-transform: uppercase;
+  display: flex;
+  gap: 0.5rem;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-garantia {
+  color: green;
+  font-size: 2rem;
 }
 
 .description-general p,
@@ -447,8 +464,23 @@ textarea {
   text-align: center;
   margin-bottom: 2rem;
 }
+
 .shipping-section img {
-  width: 90vw;
+  width: auto;
+}
+@media (max-width: 768px) {
+  .shipping-section img {
+    width: 90vw;
+  }
+  .color-options img,
+  .feature-icons img {
+    width: 150px;
+    height: auto;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    object-fit: cover;
+  }
 }
 
 /* ------- WhatsApp ------*/

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, updateDoc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -65,7 +65,7 @@ async function obtenerDataAfiliado(afiliadoId) {
     telefonoAfiliado = afiliadoDoc.data().telefono;
     nombreAfiliado = afiliadoDoc.data().nombre;
     const whatsappLink = document.getElementById('whatsapp-link');
-    whatsappLink.href = `https://wa.me/${telefonoAfiliado}`;
+    whatsappLink.href = `https://wa.me/+573124360543`;
 }
 
 async function obtenerProductoPorID(productoID) {
@@ -126,19 +126,12 @@ function calcularComisionVenta(totalAmount, comissionRate) {
     return (totalAmount * comissionRate) / 100;
 }
 
-async function guardarVenta(venta, idAfiliado) {
+async function guardarVenta(venta) {
     try {
-        // Generar un ID único para la venta
-        const nuevaVentaId = doc(collection(db, 'afiliados', idAfiliado, 'ventas')).id;
 
-        // Referencia para la subcolección de ventas del afiliado
-        const ventasRef = doc(db, 'afiliados', idAfiliado, 'ventas', nuevaVentaId);
-        await setDoc(ventasRef, venta);
-
-        // Referencia para la colección general de ventas
-        const ventaGeneralRef = doc(db, 'ventas', nuevaVentaId);
-        await setDoc(ventaGeneralRef, venta);
-
+        const ventasRef = collection(db, 'ventas');
+        const docRef = await addDoc(ventasRef, venta);
+        sendMail(venta)
     } catch (error) {
         console.error("Error al guardar la venta:", error);
     }
@@ -293,11 +286,11 @@ async function registrarVentaAfiliado(venta) {
 
 async function crearOrden() {
 
-    const idAfiliado = localStorage.getItem('afiliadoProducto');
-    if (!idAfiliado || idAfiliado == 'null') {
-        console.error("No se encontró el ID del afiliado");
-        return;
-    }
+    // const idAfiliado = localStorage.getItem('afiliadoProducto');
+    // if (!idAfiliado || idAfiliado == 'null') {
+    //     console.error("No se encontró el ID del afiliado");
+    //     return;
+    // }
 
     // Obtener valores de los inputs
     const departamento = document.getElementById('departamento').value;
@@ -332,7 +325,8 @@ async function crearOrden() {
         confirm: false,
         date: Date().toString(),
         state: 'Pendiente',
-        affiliate_id: idAfiliado,
+        nameProduct: maneProduct,
+        // affiliate_id: idAfiliado,
         totalAmount: carrito.reduce((total, product) => total + (precio * product.cantidad), 0)
     };
 
@@ -340,8 +334,8 @@ async function crearOrden() {
     document.querySelector('#carrito-items').textContent = 'Creando tu pedido...'
 
     try {
-        registrarVentaAfiliado(raw)
-        //sendMail(raw)
+        guardarVenta(raw)
+        // registrarVentaAfiliado(raw)
         msgVentaExitosa();
     } catch (error) {
         console.log(error);
@@ -357,8 +351,8 @@ function sendMail(raw) {
             from_name: 'Stocky Colombia',
             quantity: totalQuantity,
             nameProduct: maneProduct,
-            telefonoAfiliado: telefonoAfiliado,
-            nombreAfiliado: nombreAfiliado,
+            //  telefonoAfiliado: telefonoAfiliado,
+            //  nombreAfiliado: nombreAfiliado,
             precio: precio,
             total_amount: raw.totalAmount,
             address: `${raw.destinationBilling.address}, ${raw.destinationBilling.neighborhood}, ${raw.destinationBilling.city}, ${raw.destinationBilling.department}`,
@@ -385,32 +379,36 @@ function convertirURLsEnElementos(texto) {
     const imageRegex = /https?:\/\/.*\.(jpg|jpeg|png|webp)/;
 
     return texto.replace(urlRegex, function (url) {
-        if (youtubeRegex.test(url)) {
-            const videoID = url.match(youtubeRegex)[1];
+        // Limpia la URL eliminando cualquier etiqueta HTML, como </p>
+        const cleanUrl = url.replace(/<\/?p>/gi, '');
+
+        if (youtubeRegex.test(cleanUrl)) {
+            const videoID = cleanUrl.match(youtubeRegex)[1];
             return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoID}?controls=0&modestbranding=1&rel=0&autohide=1&iv_load_policy=3&fs=0" frameborder="0" allowfullscreen></iframe>`;
         }
-        if (youtubeShortsRegex.test(url)) {
-            const videoID = url.match(youtubeShortsRegex)[1];
-            return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoID}?controls=0&modestbranding=1&rel=0&autohide=1&iv_load_policy=3&fs=0" frameborder="0" allowfullscreen></iframe>`;
+        if (youtubeShortsRegex.test(cleanUrl)) {
+            const videoID = cleanUrl.match(youtubeShortsRegex)[1];
+            return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoID}?controls=0&modestbranding=1&rel=0&showinfo=0&autohide=1&iv_load_policy=3&fs=0&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
         }
-        if (vimeoRegex.test(url)) {
-            const videoID = url.match(vimeoRegex)[1];
+
+        if (vimeoRegex.test(cleanUrl)) {
+            const videoID = cleanUrl.match(vimeoRegex)[1];
             return `<iframe width="100%" height="400" src="https://player.vimeo.com/video/${videoID}?badge=0&autopause=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         }
 
-        if (gifRegex.test(url)) {
-            return `<img src="${url}" alt="GIF del producto" width="300" class="gif-producto">`;
+        if (gifRegex.test(cleanUrl)) {
+            return `<img src="${cleanUrl}" alt="GIF del producto" width="300" class="gif-producto">`;
         }
-        if (imageRegex.test(url)) {
-            return `<img src="${url}" alt="imagen del producto" width="300">`;
+        if (imageRegex.test(cleanUrl)) {
+            return `<img src="${cleanUrl}" alt="imagen del producto" width="300">`;
         }
 
-        return `<a href="${url}" target="_blank">${url}</a>`;
+        return `<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>`;
     });
 }
 
 function printHTML(producto) {
-    console.log(producto);
+    //  console.log(producto);
 
     // Agregar SEO
     SEO(producto)
@@ -425,6 +423,7 @@ function printHTML(producto) {
         <p class="price" id="price"> ${producto.price} </p>
         <button class="order-btn">COMPRAR AHORA</button>
         <ul class="features">
+            <li>¡No te quedes sin el tuyo! Compra ahora y aprovecha nuestras ofertas especiales.</li> <br>
             <li>Envío gratis a toda Colombia</li>
             <li>Pago contraentrega</li>
         </ul>
@@ -432,7 +431,7 @@ function printHTML(producto) {
 
     <section class="colors-section">
         <h2 id="textoSelecciona"></h2>
-        <div class="color-options" id="color-options"></div>
+        <div class="color-options" id="color-options"></div> <br>
         <button class="order-btn">LO QUIERO!</button>
     </section>
 
@@ -450,12 +449,12 @@ function printHTML(producto) {
     <section class="description-general">
         <h2>Descripción General</h2>
         ${descripcionConElementos}
-        <button class="order-btn">Obtén el Tuyo</button>
+        <button class="order-btn">OBTÉN EL TUYO</button>
     </section>
 
     <section class="warranty-section">
         <h2 id="tituloGarantia">Nuestra Garantía</h2>
-        <p id="descripcionGarantia">Contamos con ${producto.warranty} ${producto.warranty > 1 ? 'meses' : 'mes'} de Garantía</p>
+        <p id="descripcionGarantia"><i class="fa-solid fa-check" class="icon-garantia"></i> Contamos con ${producto.warranty} ${producto.warranty > 1 ? 'meses' : 'mes'} de Garantía</p>
     </section>
 
     <section class="shipping-section">
@@ -797,10 +796,10 @@ function msgVentaExitosa() {
     mensajeAgradecimiento.classList.add('mensaje-exito');
 
     mensajeAgradecimiento.innerHTML = `
-        <h2>¡Gracias por tu compra!</h2>
-        <p>Tu pedido ha sido procesado exitosamente.</p>
-        <p>Te enviaremos una notificación a tu correo electrónico con la información del envío.</p>
-        <p>¡Esperamos que disfrutes de tu nuevo producto!</p>
+        <h2>🎉 ¡Gracias por tu compra! 🎉</h2>
+        <p>📦 Tu pedido ha sido procesado exitosamente.</p>
+        <p>📧 Te enviaremos una notificación a tu correo electrónico con la información del envío.</p>
+        <p>🌟 ¡Esperamos que disfrutes de tu nuevo producto! 🌟</p>
     `;
     carritoItems.appendChild(mensajeAgradecimiento);
 }
